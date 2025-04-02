@@ -1,16 +1,8 @@
 import { useLocation, useNavigate } from 'react-router-dom';
 import { getAirlineName, getAirportName, formatTime, formatTravelTime } from '../utils/formatters';
 import {
-  Container,
-  Typography,
-  Paper,
-  Button,
-  Box,
-  Grid,
-  Divider,
-  List,
-  ListItem,
-  ListItemText,
+  Container, Typography, Paper, Button, Box, Grid, Divider, List, ListItem, 
+  ListItemText, Chip, Table, TableBody, TableCell, TableContainer, TableHead, TableRow
 } from '@mui/material';
 
 const DetailsPage = () => {
@@ -29,15 +21,15 @@ const DetailsPage = () => {
   return (
     <Container maxWidth="lg">
       <Box sx={{ my: 4 }}>
-      <Box display="flex" flexDirection="column" alignItems="left">
-        <Button
-          variant="outlined"
-          onClick={handleBack}
-          style={{ marginTop: '20px', marginBottom: '20px', width: '200px' }}
-        >
-          Return to Results
-        </Button>
-      </Box>
+        <Box display="flex" flexDirection="column" alignItems="left">
+          <Button
+            variant="outlined"
+            onClick={handleBack}
+            style={{ marginTop: '20px', marginBottom: '20px', width: '200px' }}
+          >
+            Return to Results
+          </Button>
+        </Box>
 
         <Grid container spacing={3}>
           <Grid item xs={12} md={8}>
@@ -61,6 +53,14 @@ const DetailsPage = () => {
                     Segment {index + 1}
                   </Typography>
                   <Grid container spacing={2}>
+                    <Grid item xs={12}>
+                      <Typography variant="subtitle2" gutterBottom>
+                        Flight {segment.flightNumber}
+                      </Typography>
+                      <Typography variant="body2" gutterBottom>
+                        Aircraft: {segment.aircraftName} ({segment.aircraftCode})
+                      </Typography>
+                    </Grid>
                     <Grid item xs={12} sm={6}>
                       <Typography variant="subtitle2">Departure</Typography>
                       <Typography>{formatTime(segment.departureTime)}</Typography>
@@ -85,6 +85,32 @@ const DetailsPage = () => {
                     </Typography>
                   </Box>
 
+                  <Box sx={{ mt: 2 }}>
+                    <Typography variant="subtitle2" gutterBottom>Travel Class</Typography>
+                    <Typography>
+                      {segment.cabin} (Class {segment.fareClass})
+                    </Typography>
+                    {segment.brandedFare && (
+                      <Typography variant="body2" color="text.secondary">
+                        {segment.brandedFareLabel || segment.brandedFare}
+                      </Typography>
+                    )}
+                  </Box>
+
+                  <Box sx={{ mt: 2 }}>
+                    <Typography variant="subtitle2" gutterBottom>Amenities</Typography>
+                    <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
+                      {segment.amenities.map((amenity: any, idx: number) => (
+                        <Chip
+                          key={idx}
+                          label={amenity.description}
+                          color={amenity.isChargeable ? "default" : "primary"}
+                          variant={amenity.isChargeable ? "outlined" : "filled"}
+                        />
+                      ))}
+                    </Box>
+                  </Box>
+
                   {index < flightDetails.segments.length - 1 && flightDetails.layovers[index] && (
                     <Box sx={{ mt: 2, bgcolor: 'grey.100', p: 2, borderRadius: 1 }}>
                       <Typography variant="subtitle2" color="text.secondary">
@@ -98,6 +124,15 @@ const DetailsPage = () => {
                 </Box>
               ))}
             </Paper>
+
+            {flightDetails.returnFlight && (
+              <Paper elevation={3} sx={{ p: 3 }}>
+                <Typography variant="h5" gutterBottom>
+                  Return Flight Details
+                </Typography>
+                {/* Similar structure as above for return flight */}
+              </Paper>
+            )}
           </Grid>
 
           <Grid item xs={12} md={4}>
@@ -105,20 +140,32 @@ const DetailsPage = () => {
               <Typography variant="h6" gutterBottom>
                 Price Details
               </Typography>
-              <List>
-                <ListItem>
-                  <ListItemText
-                    primary="Total Price"
-                    secondary={`${flightDetails.totalPrice} ${flightDetails.currency}`}
-                  />
-                </ListItem>
-                <ListItem>
-                  <ListItemText
-                    primary="Price per Traveler"
-                    secondary={`${flightDetails.pricePerTraveler} ${flightDetails.currency}`}
-                  />
-                </ListItem>
-              </List>
+              <TableContainer>
+                <Table>
+                  <TableBody>
+                    <TableRow>
+                      <TableCell>Base Price</TableCell>
+                      <TableCell align="right">{flightDetails.basePrice} {flightDetails.currency}</TableCell>
+                    </TableRow>
+                    {flightDetails.fees.map((fee: any, index: number) => (
+                      <TableRow key={index}>
+                        <TableCell>{fee.type}</TableCell>
+                        <TableCell align="right">{fee.amount} {flightDetails.currency}</TableCell>
+                      </TableRow>
+                    ))}
+                    <TableRow>
+                      <TableCell>Price per Traveler</TableCell>
+                      <TableCell align="right">{flightDetails.pricePerTraveler} {flightDetails.currency}</TableCell>
+                    </TableRow>
+                    <TableRow>
+                      <TableCell sx={{ fontWeight: 'bold' }}>Total Price</TableCell>
+                      <TableCell align="right" sx={{ fontWeight: 'bold' }}>
+                        {flightDetails.totalPrice} {flightDetails.currency}
+                      </TableCell>
+                    </TableRow>
+                  </TableBody>
+                </Table>
+              </TableContainer>
             </Paper>
           </Grid>
         </Grid>
