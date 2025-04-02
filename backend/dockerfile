@@ -23,6 +23,9 @@ WORKDIR /app
 # Copy the build files from the host to the container for development
 COPY build/libs/*.jar app.jar
 
+RUN apt-get update && apt-get install -y ca-certificates
+ENV DOCKER_ENVIRONMENT=true
+
 EXPOSE 9090
 
 ENTRYPOINT ["java", "-jar", "app.jar"]
