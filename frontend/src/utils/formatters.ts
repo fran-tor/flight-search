@@ -29,14 +29,14 @@ const formartDateTime = (dateTimeString: string): string => {
   });
 }
 
-// Converts PT10H23M to 10h 23m for example
+// Converts PT10H23M or PT48M to 10h 23m or 48m for example
 const formatTravelTime = (travelTime: string): string => {
-  const regex = /PT(\d+)H(?:(\d+)M)?/;
+  const regex = /PT(?:(\d+)H)?(?:(\d+)M)?/;
   const match = travelTime.match(regex);
   if (match) {
-    const hours = match[1];
+    const hours = match[1] || '0';
     const minutes = match[2] || '0';
-    return `${hours}h ${minutes !== '0' ? `${minutes}m` : ''}`.trim();
+    return `${hours !== '0' ? `${hours}h ` : ''}${minutes !== '0' ? `${minutes}m` : ''}`.trim();
   }
   return travelTime;
 }
