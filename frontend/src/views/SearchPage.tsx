@@ -74,6 +74,16 @@ const SearchPage = () => {
   const validateFormData = (data: FlightSearchForm) => {
     const { departureAirport, arrivalAirport, departureDate, returnDate, adults } = data;
 
+    if (departureAirport === arrivalAirport) {
+      setErrorMessage('Departure and arrival airports cannot be the same.');
+      return false;
+    }
+
+    if (departureInputValue === '' || arrivalInputValue === '') {
+      setErrorMessage('Please select a valid airport from the list.');
+      return false;
+    }
+
     if (!departureAirport || !arrivalAirport || !departureDate || !adults) {
       setErrorMessage('Please fill in all required fields.');
       return false;
