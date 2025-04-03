@@ -109,9 +109,10 @@ const SearchPage = () => {
     setLoading(true);
 
     try {
+      console.log('!!formData.returnDate: ', !!formData.returnDate);
       const response = await flights.getAll(formData);
       console.log('Flight search results:', response);
-      navigate('/results', { state: { data: response } });
+      navigate('/results', { state: { data: response, roundTrip: !!formData.returnDate } });
     } catch (error) {
       console.error('Error fetching flight data:', error);
       setErrorMessage('Failed to fetch flight data. Please try again later.');
