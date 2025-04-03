@@ -69,23 +69,42 @@ const ResultsPage = () => {
             sx={{ p: 3, mb: 2, cursor: 'pointer' }}
             onClick={() => handleFlightClick(result)}
           >
-            <Grid container spacing={2}>
-              <Grid item xs={12}>
+            <Box display="flex" flexDirection="column" minWidth="540px" flexWrap="wrap" gap={2}>
+              <Box display="flex" flexDirection="column" textAlign="left">
                 <Typography variant="subtitle1">
                   {formatTime(result.segments[0].departureTime)} - {formatTime(result.segments[result.segments.length - 1].arrivalTime)}
                 </Typography>
                 <Typography variant="body2">
                   {getAirportName(result.segments[0].departureAirport)} → {getAirportName(result.segments[result.segments.length - 1].arrivalAirport)}
                 </Typography>
-              </Grid>
-
-              <Grid item xs={12} md={6}>
-                <Box>
+                <Typography variant="body2">
+                  {formatTravelTime(result.totalDuration)} in total ({result.layovers.length > 0 ? `${result.layovers.length} stop${result.layovers.length > 1 ? 's' : ''}` : 'Nonstop'})
+                </Typography>
+                {result.layovers.length > 0 && (
                   <Typography variant="body2">
-                    {formatTravelTime(result.totalDuration)} total travel time
-                    {result.layovers.length > 0 ? ` (${result.layovers.length} stop${result.layovers.length > 1 ? 's' : ''})` : ' (Nonstop)'}
+                    {result.layovers.map((layover, index) => (
+                      <span key={index} style={{ display: 'block' }}>
+                        {formatTravelTime(layover.duration)} layover in {getAirportName(layover.airportCode)}
+                      </span>
+                    ))}
                   </Typography>
-
+                )}
+              </Box>
+              <Box flex="1 1 50%" display="flex" justifyContent="space-between" alignItems="center">
+                <Box>
+                  <Box display="flex" alignItems="left">
+                    <Typography variant="body2" color="text.secondary">
+                      {result.segments.length > 1 ? (
+                        <span>
+                          Airlines:
+                        </span>
+                      ) : (
+                        <span>
+                          Airline:
+                        </span>
+                      )}
+                    </Typography>
+                  </Box>
                   {result.segments.map((segment: any, idx: number) => (
                     <Box key={idx} sx={{ mt: 1 }}>
                       <Typography variant="body2" color="text.secondary">
@@ -96,30 +115,17 @@ const ResultsPage = () => {
                       </Typography>
                     </Box>
                   ))}
-
-                  {result.layovers.length > 0 && (
-                    <Box sx={{ mt: 1 }}>
-                      {result.layovers.map((layover: any, idx: number) => (
-                        <Typography key={idx} variant="body2" color="text.secondary">
-                          {formatTravelTime(layover.duration)} layover in {getAirportName(layover.airportCode)}
-                        </Typography>
-                      ))}
-                    </Box>
-                  )}
                 </Box>
-              </Grid>
-
-              <Grid item xs={12} md={6}>
-                <Box display="flex" flexDirection="column" alignItems="flex-end">
+                <Box textAlign="right">
                   <Typography variant="h6">
-                    {result.totalPrice} {result.currency}
+                    {result.totalPrice} {result.currency} total
                   </Typography>
-                  <Typography variant="body2" color="text.secondary">
+                  <Typography variant="body2">
                     {result.pricePerTraveler} {result.currency} per traveler
                   </Typography>
                 </Box>
-              </Grid>
-            </Grid>
+              </Box>
+            </Box>
           </Paper>
         </Box>
       ))}
