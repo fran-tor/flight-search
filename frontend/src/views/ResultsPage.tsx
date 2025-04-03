@@ -44,20 +44,45 @@ const ResultsPage = () => {
     navigate('/flight-details', { state: { flightDetails: result } });
   };
 
+  const formatDuration = (duration: string): string => {
+    const regex = /PT(?:(\d+)H)?(?:(\d+)M)?/;
+    const match = duration.match(regex);
+    if (match) {
+      const hours = match[1] || '0';
+      const minutes = match[2] || '0';
+      return `${hours !== '0' ? `${hours}h ` : ''}${minutes !== '0' ? `${minutes}m` : ''}`.trim();
+    }
+    return duration;
+  };
+
   const handleSort = (criteria: string) => {
     setSortBy(criteria);
     const sortedResults = [...results].sort((a, b) => {
       if (criteria === 'price') {
         return parseFloat(a.totalPrice) - parseFloat(b.totalPrice);
       } else {
-        const getDurationInMinutes = (duration: string) => {
-          const [hours, minutes] = duration.split(':').map(Number);
-          return hours * 60 + minutes;
+        console.log('Sorting by duration');
+        const parseDurationToMinutes = (duration: string) => {
+          const regex = /PT(?:(\d+)H)?(?:(\d+)M)?/;
+          const match = duration.match(regex);
+          if (match) {
+            const hours = parseInt(match[1] || '0', 10);
+            const minutes = parseInt(match[2] || '0', 10);
+            return hours * 60 + minutes;
+          }
+          console.error('Invalid duration format:', duration);
+          return NaN;
         };
-        return getDurationInMinutes(a.totalDuration) - getDurationInMinutes(b.totalDuration);
+        console.log('Duration A in minutes:', parseDurationToMinutes(a.totalDuration));
+        console.log('Duration B in minutes:', parseDurationToMinutes(b.totalDuration));
+        return parseDurationToMinutes(a.totalDuration) - parseDurationToMinutes(b.totalDuration);
       }
     });
     setResults(sortedResults);
+    console.log('Sorted results:', sortedResults.map((result) => ({
+      totalPrice: result.totalPrice,
+      totalDuration: result.totalDuration,
+    })));
   };
 
   return (
