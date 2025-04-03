@@ -158,9 +158,7 @@ public class FlightSearchService {
             System.out.println("Price Per Traveler: " + firstFlight.getPricePerTraveler());
             System.out.println("Total Duration: " + firstFlight.getTotalDuration());
             System.out.println("Fees:");
-            firstFlight.getFees().forEach(fee -> 
-                System.out.println("  " + fee.getType() + ": " + fee.getAmount())
-            );
+            firstFlight.getFees().forEach(fee -> System.out.println("  " + fee.getType() + ": " + fee.getAmount()));
             System.out.println("Segments:");
             for (FlightSegmentDetails segment : firstFlight.getSegments()) {
                 System.out.println("  Flight Number: " + segment.getFlightNumber());
@@ -178,13 +176,13 @@ public class FlightSearchService {
                 System.out.println("  Included Checked Bags: " + segment.getIncludedCheckedBags());
                 System.out.println("  Amenities:");
                 for (Amenity amenity : segment.getAmenities()) {
-                    System.out.println("    - " + amenity.getDescription() + " (Chargeable: " + amenity.isChargeable() + ")");
+                    System.out.println(
+                            "    - " + amenity.getDescription() + " (Chargeable: " + amenity.isChargeable() + ")");
                 }
             }
             System.out.println("Layovers:");
-            firstFlight.getLayovers().forEach(layover -> 
-                System.out.println("  " + layover.getAirportCode() + ": " + layover.getDuration())
-            );
+            firstFlight.getLayovers().forEach(
+                    layover -> System.out.println("  " + layover.getAirportCode() + ": " + layover.getDuration()));
         }
 
         return flightDetailsList;
