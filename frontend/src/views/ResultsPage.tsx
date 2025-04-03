@@ -2,7 +2,9 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { getAirlineName, getAirportName, formatTime, formatTravelTime } from '../utils/formatters';
 import {
   Container, Typography, Paper, Button, Box, FormControl, InputLabel, Select, MenuItem, Divider,
-  Chip
+  Chip,
+  Pagination,
+  Stack
 } from '@mui/material';
 import { useState } from 'react';
 
@@ -35,6 +37,8 @@ const ResultsPage = () => {
   const [sortBy, setSortBy] = useState('price');
   const [results, setResults] = useState<FlightResult[]>(location.state?.data || []);
   const [isRoundTrip] = useState(location.state?.roundTrip || false);
+  const [page, setPage] = useState(1);
+  const itemsPerPage = 10;
 
   const handleReturnToSearch = () => {
     navigate('/');
@@ -43,6 +47,15 @@ const ResultsPage = () => {
   const handleFlightClick = (result: FlightResult) => {
     navigate('/flight-details', { state: { flightDetails: result } });
   };
+
+  const handlePageChange = (_event: React.ChangeEvent<unknown>, value: number) => {
+    setPage(value);
+  };
+
+  const paginatedResults = results.slice(
+    (page - 1) * itemsPerPage,
+    page * itemsPerPage
+  );
 
   const formatDuration = (duration: string): string => {
     const regex = /PT(?:(\d+)H)?(?:(\d+)M)?/;
@@ -108,7 +121,7 @@ const ResultsPage = () => {
         </FormControl>
       </Box>
 
-      {results.map((result: FlightResult, index: number) => (
+      {paginatedResults.map((result: FlightResult, index: number) => (
         <Box key={index} >
           {isRoundTrip && (index) % 2 === 0 && (
             <Divider sx={{ my: 2 }} >
@@ -173,6 +186,18 @@ const ResultsPage = () => {
           </Paper>
         </Box>
       ))}
+
+      {results.length > 0 && (
+        <Box sx={{ display: 'flex', justifyContent: 'center', marginTop: 2, marginBottom: 2 }}>
+          <Stack spacing={2}>
+            <Pagination
+              count={Math.ceil(results.length / itemsPerPage)}
+              page={page}
+              onChange={handlePageChange}
+            />
+          </Stack>
+        </Box>
+      )}
 
       {results.length === 0 && (
         <Typography variant="body1" align="center" sx={{ mt: 4 }}>
