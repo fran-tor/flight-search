@@ -17,6 +17,7 @@ import {
 } from '@mui/material';
 import { flights } from '../api/flights';
 import airports from '../assets/data/airports.json';
+import mockup_response from '../assets/data/flight_search_results.json';
 
 interface FlightSearchForm {
   departureAirport: string;
@@ -108,6 +109,27 @@ const SearchPage = () => {
     return true;
   };
 
+  // Download the response as a JSON file
+  const saveResponseToJSON = async (response: any) => {
+    const blob = new Blob([JSON.stringify(response, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `flight_search_results_${new Date().toISOString().split('T')[0]}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
+  const isMockupRequest = (request: FlightSearchForm) => {
+    const { departureAirport, arrivalAirport, departureDate, returnDate } = request;
+    return (
+      departureAirport === 'MEX' &&
+      arrivalAirport === 'SFO' &&
+      departureDate === '2025-04-05' &&
+      returnDate === ''
+    );
+  }
+
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
     console.log(formData);
@@ -121,11 +143,22 @@ const SearchPage = () => {
     try {
       console.log('!!formData.returnDate: ', !!formData.returnDate);
       const response = await flights.getAll(formData);
-      console.log('Flight search results:', response);
-      navigate('/results', { state: { data: response, roundTrip: !!formData.returnDate } });
+      // saveResponseToJSON(response);
+      if (isMockupRequest(formData)) {
+        console.log('Mockup request detected. Using mockup response.');
+        navigate('/results', { state: { data: mockup_response, roundTrip: !!formData.returnDate } });
+      } else {
+        console.log('Flight search results:', response);
+        navigate('/results', { state: { data: response, roundTrip: !!formData.returnDate } });
+      }
     } catch (error) {
-      console.error('Error fetching flight data:', error);
-      setErrorMessage('Failed to fetch flight data. Please try again later.');
+      if (isMockupRequest(formData)) {
+        console.log('Mockup request detected. Using mockup response.');
+        navigate('/results', { state: { data: mockup_response, roundTrip: !!formData.returnDate } });
+      } else {
+        console.error('Error fetching flight data:', error);
+        setErrorMessage('Failed to fetch flight data. Please try again later.');
+      }
     } finally {
       setLoading(false);
     }
@@ -268,8 +301,8 @@ const SearchPage = () => {
                     setFormData((prevFormData) => ({
                       ...prevFormData,
                       returnDate: event.target.checked
-                      ? new Date(new Date(prevFormData.departureDate).getTime() + 86400000).toISOString().split('T')[0]
-                      : '',
+                        ? new Date(new Date(prevFormData.departureDate).getTime() + 86400000).toISOString().split('T')[0]
+                        : '',
                     }));
                   }}
                   name="returnDateSwitch"

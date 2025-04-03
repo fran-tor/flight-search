@@ -1,5 +1,5 @@
 import { useLocation, useNavigate } from 'react-router-dom';
-import { getAirlineName, getAirportName, formatTime, formatTravelTime } from '../utils/formatters';
+import { getAirlineName, getAirportName, formatTime, formartDateTime, formatTravelTime } from '../utils/formatters';
 import {
   Container, Typography, Paper, Button, Box, Grid, Divider, List, ListItem, 
   ListItemText, Chip, Table, TableBody, TableCell, TableContainer, TableHead, TableRow
@@ -63,12 +63,12 @@ const DetailsPage = () => {
                     </Grid>
                     <Grid item xs={12} sm={6}>
                       <Typography variant="subtitle2">Departure</Typography>
-                      <Typography>{formatTime(segment.departureTime)}</Typography>
+                      <Typography>{formartDateTime(segment.departureTime)} {formatTime(segment.departureTime)}</Typography>
                       <Typography>{getAirportName(segment.departureAirport)}</Typography>
                     </Grid>
                     <Grid item xs={12} sm={6}>
                       <Typography variant="subtitle2">Arrival</Typography>
-                      <Typography>{formatTime(segment.arrivalTime)}</Typography>
+                      <Typography>{formartDateTime(segment.arrivalTime)} {formatTime(segment.arrivalTime)}</Typography>
                       <Typography>{getAirportName(segment.arrivalAirport)}</Typography>
                     </Grid>
                   </Grid>

@@ -20,6 +20,15 @@ const formatTime = (dateTimeString: string): string => {
   });
 };
 
+const formartDateTime = (dateTimeString: string): string => {
+  const date = new Date(dateTimeString);
+  return date.toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit'
+  });
+}
+
 // Converts PT10H23M to 10h 23m for example
 const formatTravelTime = (travelTime: string): string => {
   const regex = /PT(\d+)H(?:(\d+)M)?/;
@@ -32,4 +41,4 @@ const formatTravelTime = (travelTime: string): string => {
   return travelTime;
 }
 
-export { getAirlineName, getAirportName, formatTime, formatTravelTime };
+export { getAirlineName, getAirportName, formatTime, formartDateTime, formatTravelTime };
