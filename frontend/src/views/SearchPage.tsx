@@ -40,8 +40,8 @@ type AirportsData = {
 const SearchPage = () => {
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState<FlightSearchForm>({
-    departureAirport: 'SFO',
-    arrivalAirport: 'LAX',
+    departureAirport: '',
+    arrivalAirport: '',
     departureDate: new Date(Date.now() + 86400000).toISOString().split('T')[0],
     returnDate: '',
     currency: 'USD',
@@ -268,8 +268,8 @@ const SearchPage = () => {
                     setFormData((prevFormData) => ({
                       ...prevFormData,
                       returnDate: event.target.checked
-                        ? new Date(Date.now() + 86400000).toISOString().split('T')[0]
-                        : '',
+                      ? new Date(new Date(prevFormData.departureDate).getTime() + 86400000).toISOString().split('T')[0]
+                      : '',
                     }));
                   }}
                   name="returnDateSwitch"
