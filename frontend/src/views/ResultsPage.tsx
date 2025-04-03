@@ -1,23 +1,46 @@
 import { useLocation, useNavigate } from 'react-router-dom';
 import { getAirlineName, getAirportName, formatTime, formatTravelTime } from '../utils/formatters';
 import {
-  Container, Typography, Paper, Button, Box, FormControl, InputLabel, Select, MenuItem, Grid, Divider,
+  Container, Typography, Paper, Button, Box, FormControl, InputLabel, Select, MenuItem, Divider,
   Chip
 } from '@mui/material';
 import { useState } from 'react';
 
+interface Layover {
+  duration: string;
+  airportCode: string;
+}
+
+interface Segment {
+  departureTime: string;
+  arrivalTime: string;
+  departureAirport: string;
+  arrivalAirport: string;
+  carrierCode: string;
+  operatingCarrierCode?: string;
+}
+
+interface FlightResult {
+  segments: Segment[];
+  layovers: Layover[];
+  totalDuration: string;
+  totalPrice: string;
+  currency: string;
+  pricePerTraveler: string;
+}
+
 const ResultsPage = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const [sortBy, setSortBy] = useState('price'); // 'price' or 'duration'
-  const [results, setResults] = useState(location.state?.data || []);
+  const [sortBy, setSortBy] = useState('price');
+  const [results, setResults] = useState<FlightResult[]>(location.state?.data || []);
   const [isRoundTrip] = useState(location.state?.roundTrip || false);
 
   const handleReturnToSearch = () => {
     navigate('/');
   };
 
-  const handleFlightClick = (result: any) => {
+  const handleFlightClick = (result: FlightResult) => {
     navigate('/flight-details', { state: { flightDetails: result } });
   };
 
@@ -27,7 +50,11 @@ const ResultsPage = () => {
       if (criteria === 'price') {
         return parseFloat(a.totalPrice) - parseFloat(b.totalPrice);
       } else {
-        return a.totalDuration.localeCompare(b.totalDuration);
+        const getDurationInMinutes = (duration: string) => {
+          const [hours, minutes] = duration.split(':').map(Number);
+          return hours * 60 + minutes;
+        };
+        return getDurationInMinutes(a.totalDuration) - getDurationInMinutes(b.totalDuration);
       }
     });
     setResults(sortedResults);
@@ -56,7 +83,7 @@ const ResultsPage = () => {
         </FormControl>
       </Box>
 
-      {results.map((result: any, index: number) => (
+      {results.map((result: FlightResult, index: number) => (
         <Box key={index} >
           {isRoundTrip && (index) % 2 === 0 && (
             <Divider sx={{ my: 2 }} >
@@ -82,7 +109,7 @@ const ResultsPage = () => {
                 </Typography>
                 {result.layovers.length > 0 && (
                   <Typography variant="body2">
-                    {result.layovers.map((layover, index) => (
+                    {result.layovers.map((layover: Layover, index: number) => (
                       <span key={index} style={{ display: 'block' }}>
                         {formatTravelTime(layover.duration)} layover in {getAirportName(layover.airportCode)}
                       </span>
@@ -94,18 +121,10 @@ const ResultsPage = () => {
                 <Box>
                   <Box display="flex" alignItems="left">
                     <Typography variant="body2" color="text.secondary">
-                      {result.segments.length > 1 ? (
-                        <span>
-                          Airlines:
-                        </span>
-                      ) : (
-                        <span>
-                          Airline:
-                        </span>
-                      )}
+                      {result.segments.length > 1 ? 'Airlines:' : 'Airline:'}
                     </Typography>
                   </Box>
-                  {result.segments.map((segment: any, idx: number) => (
+                  {result.segments.map((segment: Segment, idx: number) => (
                     <Box key={idx} sx={{ mt: 1 }}>
                       <Typography variant="body2" color="text.secondary">
                         {getAirlineName(segment.carrierCode)}
